@@ -1,0 +1,212 @@
+@import "tailwindcss";
+
+/* ============================================
+   Fitness Plus Gym - Global Styles
+   ============================================ */
+
+:root {
+  --color-primary: #000000;
+  --color-secondary: #ff0000;
+  --color-accent: #ff2d2d;
+  --color-glow: rgba(255, 0, 0, 0.6);
+  --color-glow-soft: rgba(255, 0, 0, 0.15);
+  --color-dark-bg: #050505;
+  --color-card-bg: rgba(255, 255, 255, 0.03);
+  --color-card-border: rgba(255, 255, 255, 0.06);
+  --font-heading-stack: "Arial Narrow", "Bahnschrift Condensed", sans-serif;
+  --font-body-stack: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body), var(--font-body-stack);
+  background: var(--color-dark-bg);
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(255, 0, 0, 0.3);
+  color: #ffffff;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 0, 0, 0.4);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 0, 0, 0.6);
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 0, 0, 0.3);
+  box-shadow:
+    0 0 40px rgba(255, 0, 0, 0.08),
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.text-glow {
+  text-shadow:
+    0 0 20px rgba(255, 0, 0, 0.5),
+    0 0 40px rgba(255, 0, 0, 0.3),
+    0 0 80px rgba(255, 0, 0, 0.1);
+}
+
+.text-glow-subtle {
+  text-shadow:
+    0 0 10px rgba(255, 0, 0, 0.3),
+    0 0 20px rgba(255, 0, 0, 0.15);
+}
+
+.box-glow {
+  box-shadow:
+    0 0 20px rgba(255, 0, 0, 0.3),
+    0 0 40px rgba(255, 0, 0, 0.15),
+    0 0 80px rgba(255, 0, 0, 0.05);
+}
+
+.box-glow-intense {
+  box-shadow:
+    0 0 30px rgba(255, 0, 0, 0.5),
+    0 0 60px rgba(255, 0, 0, 0.3),
+    0 0 120px rgba(255, 0, 0, 0.1);
+}
+
+.gradient-dark {
+  background: linear-gradient(180deg, #050505 0%, #0a0a0a 50%, #050505 100%);
+}
+
+.gradient-radial-red {
+  background: radial-gradient(ellipse at center, rgba(255, 0, 0, 0.08) 0%, transparent 70%);
+}
+
+.gradient-hero {
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(255, 0, 0, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(255, 45, 45, 0.06) 0%, transparent 40%),
+    linear-gradient(180deg, #020202 0%, #050505 100%);
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 20px rgba(255, 0, 0, 0.4),
+      0 0 40px rgba(255, 0, 0, 0.2);
+  }
+
+  50% {
+    box-shadow:
+      0 0 30px rgba(255, 0, 0, 0.6),
+      0 0 60px rgba(255, 0, 0, 0.3),
+      0 0 100px rgba(255, 0, 0, 0.1);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  14% {
+    transform: scale(1.15);
+  }
+
+  28% {
+    transform: scale(1);
+  }
+
+  42% {
+    transform: scale(1.1);
+  }
+
+  56% {
+    transform: scale(1);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2.5s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+.animate-heartbeat {
+  animation: heartbeat 2s ease-in-out infinite;
+}
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.3), transparent);
+}
+
+.noise-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+.font-heading {
+  font-family: var(--font-heading), var(--font-heading-stack);
+}
