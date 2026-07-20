@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, Canvas } from "@react-three/fiber";
+import { Preload } from "@react-three/drei";
 import * as THREE from "three";
 
 interface HologramModelProps {
@@ -229,5 +230,48 @@ export default function HologramModel({ weight, height, goal }: HologramModelPro
         <lineBasicMaterial attach="material" transparent opacity={0.2} color={modifiers.color} />
       </gridHelper>
     </group>
+  );
+}
+
+export function HologramCanvas({
+  weight,
+  height,
+  goal,
+}: {
+  weight: number;
+  height: number;
+  goal: "muscle" | "fat" | "fitness";
+}) {
+  return (
+    <div className="w-full h-full relative aspect-square md:aspect-video rounded-xl overflow-hidden glass border border-white/5">
+      <Canvas
+        camera={{ position: [0, 0, 3.2], fov: 45 }}
+        dpr={[1, 1.5]}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: "high-performance",
+          toneMapping: THREE.ACESFilmicToneMapping,
+        }}
+        style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+      >
+        <ambientLight intensity={0.6} />
+        <pointLight position={[5, 5, 5]} intensity={1} />
+        <HologramModel weight={weight} height={height} goal={goal} />
+        <Preload all />
+      </Canvas>
+      {/* Cyberpunk HUD Overlays */}
+      <div className="absolute top-4 left-4 font-mono text-[10px] text-white/40 pointer-events-none space-y-1">
+        <div>SYS_MODEL: HUMAN_GRID_v4.2</div>
+        <div>STATUS: ONLINE</div>
+      </div>
+      <div className="absolute bottom-4 right-4 font-mono text-[10px] text-white/40 pointer-events-none text-right">
+        <div>SCANNING ACTIVE</div>
+        <div className="text-red-500 animate-pulse">● REC_PROFILE</div>
+      </div>
+      {/* HUD Corner decors */}
+      <div className="absolute top-3 right-3 w-4 h-4 border-t border-r border-white/10 pointer-events-none" />
+      <div className="absolute bottom-3 left-3 w-4 h-4 border-b border-l border-white/10 pointer-events-none" />
+    </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Navbar from "@/components/sections/Navbar";
 import Hero from "@/components/sections/Hero";
+import PerformanceStory from "@/components/sections/PerformanceStory";
 import About from "@/components/sections/About";
 import Services from "@/components/sections/Services";
 import InteractiveHub from "@/components/sections/InteractiveHub";
@@ -28,6 +29,7 @@ export default function Home() {
     <main className="relative">
       <Navbar />
       <Hero />
+      <PerformanceStory />
       <div className="section-divider" />
       <About />
       <div className="section-divider" />
