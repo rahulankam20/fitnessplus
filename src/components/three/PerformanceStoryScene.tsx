@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, Suspense } from "react";
+import { useRef, useMemo, Suspense, useEffect, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Preload, Points, PointMaterial } from "@react-three/drei";
 import * as THREE from "three";
@@ -168,7 +168,7 @@ function AssemblingBarbell({ scroll }: { scroll: React.RefObject<number> }) {
 
 // ============================================
 // Holographic Body Scan — Act 2 (0.40–0.60)
-// Canonical pattern: JSX materials, traverse group in useFrame
+// Canonical pattern: JSX materials, cached mesh refs in useFrame
 // ============================================
 
 // Helper wrappers to tag meshes via userData
@@ -197,11 +197,41 @@ const J = ({ pos }: { pos?: [number,number,number] }) => (
 function HologramFigure({ scroll }: { scroll: React.RefObject<number> }) {
   const groupRef = useRef<THREE.Group>(null);
   const scanRef = useRef<THREE.Mesh>(null);
-  // Track opacity state without refs to avoid lint errors
   const visRef = useRef(0);
+
+  // Cached mesh references per category
+  const cachedRef = useRef(false);
+  const holoMeshesRef = useRef<THREE.Mesh[]>([]);
+  const jointMeshesRef = useRef<THREE.Mesh[]>([]);
+  const scanMeshesRef = useRef<THREE.Mesh[]>([]);
 
   useFrame((state) => {
     if (!groupRef.current) return;
+
+    // Collect and categorize meshes ONCE instead of walking tree every frame
+    if (!cachedRef.current) {
+      const holo: THREE.Mesh[] = [];
+      const joint: THREE.Mesh[] = [];
+      const scan: THREE.Mesh[] = [];
+
+      groupRef.current.traverse((child) => {
+        if (child instanceof THREE.Mesh && child.material) {
+          if (child.userData.isHolo) {
+            holo.push(child);
+          } else if (child.userData.isJoint) {
+            joint.push(child);
+          } else if (child.userData.isScan) {
+            scan.push(child);
+          }
+        }
+      });
+
+      holoMeshesRef.current = holo;
+      jointMeshesRef.current = joint;
+      scanMeshesRef.current = scan;
+      cachedRef.current = true;
+    }
+
     const s = scroll.current ?? 0;
     const t = state.clock.getElapsedTime();
 
@@ -213,22 +243,25 @@ function HologramFigure({ scroll }: { scroll: React.RefObject<number> }) {
     groupRef.current.visible = vis > 0.01;
     groupRef.current.rotation.y = t * 0.45;
 
-    // Traverse all meshes and update material properties via mesh ref
-    groupRef.current.traverse((child) => {
-      if (child instanceof THREE.Mesh && child.material) {
-        const mat = child.material as THREE.MeshStandardMaterial | THREE.MeshBasicMaterial;
-        if (child.userData.isHolo) {
-          mat.opacity = vis * 0.3;
-        } else if (child.userData.isJoint) {
-          mat.opacity = vis * 0.9;
-          if ("emissiveIntensity" in mat) {
-            (mat as THREE.MeshStandardMaterial).emissiveIntensity = 1.2 + Math.sin(t * 3) * 0.5;
-          }
-        } else if (child.userData.isScan) {
-          mat.opacity = vis * 0.8;
-        }
-      }
-    });
+    // Update holo meshes
+    for (let i = 0; i < holoMeshesRef.current.length; i++) {
+      const mat = holoMeshesRef.current[i].material as THREE.Material;
+      mat.opacity = vis * 0.3;
+    }
+
+    // Update joint meshes
+    const jointEmissive = 1.2 + Math.sin(t * 3) * 0.5;
+    for (let i = 0; i < jointMeshesRef.current.length; i++) {
+      const mat = jointMeshesRef.current[i].material as THREE.MeshStandardMaterial;
+      mat.opacity = vis * 0.9;
+      mat.emissiveIntensity = jointEmissive;
+    }
+
+    // Update scan meshes
+    for (let i = 0; i < scanMeshesRef.current.length; i++) {
+      const mat = scanMeshesRef.current[i].material as THREE.Material;
+      mat.opacity = vis * 0.8;
+    }
 
     if (scanRef.current) {
       scanRef.current.position.y = Math.sin(t * 1.6) * 1.1;
@@ -402,32 +435,50 @@ interface PerformanceStorySceneProps {
 }
 
 export default function PerformanceStoryScene({ scrollProgress }: PerformanceStorySceneProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <Canvas
-      camera={{ position: [0, 0.5, 5.5], fov: 44 }}
-      dpr={[1, 1.5]}
-      gl={{
-        antialias: true,
-        alpha: false,
-        powerPreference: "high-performance",
-        toneMapping: THREE.ACESFilmicToneMapping,
-        toneMappingExposure: 1.3,
-      }}
-      style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-    >
-      <Suspense fallback={null}>
-        <color attach="background" args={["#030303"]} />
-        <fog attach="fog" args={["#030303", 8, 22]} />
-        <Environment preset="night" />
-        <Lighting scrollProgress={scrollProgress} mode="story" />
-        <GymFloor scroll={scrollProgress} />
-        <GymPlatform scroll={scrollProgress} />
-        <AssemblingBarbell scroll={scrollProgress} />
-        <HologramFigure scroll={scrollProgress} />
-        <OrbitalParticles scroll={scrollProgress} />
-        <StoryCameraRig scroll={scrollProgress} />
-        <Preload all />
-      </Suspense>
-    </Canvas>
+    <div ref={containerRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
+      <Canvas
+        frameloop={isVisible ? "always" : "never"}
+        camera={{ position: [0, 0.5, 5.5], fov: 44 }}
+        dpr={[1, 1.5]}
+        gl={{
+          antialias: true,
+          alpha: false,
+          powerPreference: "high-performance",
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.3,
+        }}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+      >
+        <Suspense fallback={null}>
+          <color attach="background" args={["#030303"]} />
+          <fog attach="fog" args={["#030303", 8, 22]} />
+          <Environment preset="night" />
+          <Lighting scrollProgress={scrollProgress} mode="story" />
+          <GymFloor scroll={scrollProgress} />
+          <GymPlatform scroll={scrollProgress} />
+          <AssemblingBarbell scroll={scrollProgress} />
+          <HologramFigure scroll={scrollProgress} />
+          <OrbitalParticles scroll={scrollProgress} />
+          <StoryCameraRig scroll={scrollProgress} />
+          <Preload all />
+        </Suspense>
+      </Canvas>
+    </div>
   );
 }

@@ -94,6 +94,8 @@ export default function PerformanceStory() {
   const progressTextRef = useRef<HTMLDivElement>(null);
   const dotRefs = useRef<Array<HTMLDivElement | null>>([]);
   const actRefs = useRef<Array<HTMLDivElement | null>>([]);
+  // Cached references for animated inner text elements per act
+  const textRefs = useRef<Array<Array<HTMLElement | null>>>([]);
 
   useEffect(() => {
     // Check for reduced motion preference
@@ -102,7 +104,11 @@ export default function PerformanceStory() {
       setReducedMotion(mq.matches);
     }, 0);
 
+    let ticking = false;
+    let rafId: number | null = null;
+
     const updateScroll = () => {
+      ticking = false;
       if (!sectionRef.current) return;
       const rect = sectionRef.current.getBoundingClientRect();
       const sectionHeight = sectionRef.current.offsetHeight - window.innerHeight;
@@ -168,21 +174,32 @@ export default function PerformanceStory() {
         el.style.pointerEvents = (opacity > 0.01 && "isCTA" in act && act.isCTA) ? "auto" : "none";
         el.style.display = opacity > 0.001 ? "flex" : "none";
 
-        // Animate overlay text slide up effect
-        const textElements = el.querySelectorAll(".cinematic-text-inner");
-        textElements.forEach((txt) => {
-          const htmlTxt = txt as HTMLElement;
-          htmlTxt.style.transform = `translateY(${(1 - opacity) * 30}px)`;
-        });
+        // Animate overlay text slide up effect using cached text element references
+        const cachedTextElements = textRefs.current[idx];
+        if (cachedTextElements) {
+          cachedTextElements.forEach((txt) => {
+            if (txt) {
+              txt.style.transform = `translateY(${(1 - opacity) * 30}px)`;
+            }
+          });
+        }
       });
     };
 
-    window.addEventListener("scroll", updateScroll, { passive: true });
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        rafId = requestAnimationFrame(updateScroll);
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
     updateScroll();
 
     return () => {
       clearTimeout(timer);
-      window.removeEventListener("scroll", updateScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", onScroll);
     };
   }, []);
 
@@ -303,12 +320,22 @@ export default function PerformanceStory() {
             >
               {/* Main text */}
               <div className="overflow-hidden">
-                <p className="cinematic-text text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-none cinematic-text-inner transition-transform duration-75">
+                <p
+                  ref={(el) => {
+                    if (!textRefs.current[idx]) textRefs.current[idx] = [];
+                    textRefs.current[idx][0] = el;
+                  }}
+                  className="cinematic-text text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-none cinematic-text-inner transition-transform duration-75"
+                >
                   {line1}
                 </p>
               </div>
               <div className="overflow-hidden">
                 <p
+                  ref={(el) => {
+                    if (!textRefs.current[idx]) textRefs.current[idx] = [];
+                    textRefs.current[idx][1] = el;
+                  }}
                   className={`cinematic-text text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-none cinematic-text-inner transition-transform duration-75 ${
                     accent ? "cinematic-text-red" : "text-white/90"
                   }`}
