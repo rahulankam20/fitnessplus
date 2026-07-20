@@ -9,47 +9,7 @@ import Button from "@/components/ui/Button";
 
 // Dynamic imports for Three.js canvases to skip SSR
 const HologramCanvas = dynamic(
-  () => import("@/components/three/HologramModel").then((mod) => {
-    // Wrap it in a Three Canvas environment locally
-    const { Canvas } = require("@react-three/fiber");
-    const { Preload } = require("@react-three/drei");
-    const THREE = require("three");
-    
-    return function DynamicHoloWrapper({ weight, height, goal }: any) {
-      return (
-        <div className="w-full h-full relative aspect-square md:aspect-video rounded-xl overflow-hidden glass border border-white/5">
-          <Canvas
-            camera={{ position: [0, 0, 3.2], fov: 45 }}
-            dpr={[1, 1.5]}
-            gl={{
-              antialias: true,
-              alpha: true,
-              powerPreference: "high-performance",
-              toneMapping: THREE.ACESFilmicToneMapping,
-            }}
-            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
-          >
-            <ambientLight intensity={0.6} />
-            <pointLight position={[5, 5, 5]} intensity={1} />
-            <mod.default weight={weight} height={height} goal={goal} />
-            <Preload all />
-          </Canvas>
-          {/* Cyberpunk HUD Overlays */}
-          <div className="absolute top-4 left-4 font-mono text-[10px] text-white/40 pointer-events-none space-y-1">
-            <div>SYS_MODEL: HUMAN_GRID_v4.2</div>
-            <div>STATUS: ONLINE</div>
-          </div>
-          <div className="absolute bottom-4 right-4 font-mono text-[10px] text-white/40 pointer-events-none text-right">
-            <div>SCANNING ACTIVE</div>
-            <div className="text-red-500 animate-pulse">● REC_PROFILE</div>
-          </div>
-          {/* HUD Corner decors */}
-          <div className="absolute top-3 right-3 w-4 h-4 border-t border-r border-white/10 pointer-events-none" />
-          <div className="absolute bottom-3 left-3 w-4 h-4 border-b border-l border-white/10 pointer-events-none" />
-        </div>
-      );
-    };
-  }),
+  () => import("@/components/three/HologramModel").then((mod) => mod.HologramCanvas),
   {
     ssr: false,
     loading: () => (
@@ -82,6 +42,20 @@ interface InteractiveHubProps {
   setPrefilledMessage: (message: string) => void;
 }
 
+// Training mode config per equipment
+const TRAINING_MODES = {
+  barbell: { label: "STRENGTH", color: "#dc2626", bg: "rgba(220,38,38,0.08)", border: "rgba(220,38,38,0.25)" },
+  dumbbell: { label: "HYPERTROPHY", color: "#60a5fa", bg: "rgba(96,165,250,0.08)", border: "rgba(96,165,250,0.25)" },
+  kettlebell: { label: "ATHLETIC CONDITIONING", color: "#f59e0b", bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.25)" },
+} as const;
+
+// Equipment accent colors
+const EQUIPMENT_COLORS = {
+  barbell: { ring: "#dc2626", glow: "rgba(220,38,38,0.15)" },
+  dumbbell: { ring: "#60a5fa", glow: "rgba(96,165,250,0.12)" },
+  kettlebell: { ring: "#f59e0b", glow: "rgba(245,158,11,0.12)" },
+} as const;
+
 export default function InteractiveHub({ setPrefilledMessage }: InteractiveHubProps) {
   const [activeTab, setActiveTab] = useState<"planner" | "showroom">("planner");
   
@@ -93,6 +67,10 @@ export default function InteractiveHub({ setPrefilledMessage }: InteractiveHubPr
 
   // Equipment Showroom States
   const [showroomEquipment, setShowroomEquipment] = useState<"dumbbell" | "kettlebell" | "barbell">("barbell");
+
+  const handleEquipmentChange = (eq: typeof showroomEquipment) => {
+    setShowroomEquipment(eq);
+  };
 
   // Dynamic calculations
   const bmi = (weight / ((height / 100) ** 2)).toFixed(1);
@@ -389,37 +367,71 @@ export default function InteractiveHub({ setPrefilledMessage }: InteractiveHubPr
               {/* Sidebar selectors (5 Columns) */}
               <div className="lg:col-span-5 flex flex-col justify-between glass-card p-6 md:p-8 rounded-2xl border border-white/5 space-y-6">
                 <div>
-                  <h3 className="font-heading text-2xl font-bold tracking-wide text-white mb-6">
-                    SELECT A 3D MACHINE OR TOOL
-                  </h3>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="font-heading text-2xl font-bold tracking-wide text-white">
+                      SELECT EQUIPMENT
+                    </h3>
+                    {/* Training Mode Badge */}
+                    <div
+                      className="training-mode-badge"
+                      style={{
+                        color: TRAINING_MODES[showroomEquipment].color,
+                        background: TRAINING_MODES[showroomEquipment].bg,
+                        borderColor: TRAINING_MODES[showroomEquipment].border,
+                      }}
+                    >
+                      <span
+                        className="w-1.5 h-1.5 rounded-full animate-pulse"
+                        style={{ background: TRAINING_MODES[showroomEquipment].color }}
+                      />
+                      {TRAINING_MODES[showroomEquipment].label}
+                    </div>
+                  </div>
                   
                   {/* Selector List */}
                   <div className="space-y-3">
-                    {equipments.map((equip) => (
+                    {equipments.map((equip) => {
+                      const isActive = showroomEquipment === equip.id;
+                      const eColor = EQUIPMENT_COLORS[equip.id];
+                      return (
                       <button
                         key={equip.id}
-                        onClick={() => setShowroomEquipment(equip.id)}
-                        className={`w-full text-left p-4 rounded-xl transition-all duration-300 border ${
-                          showroomEquipment === equip.id
-                            ? "bg-white/[0.04] border-red-500/40 shadow-[0_0_15px_rgba(255,0,0,0.06)]"
-                            : "bg-white/[0.01] border-white/5 hover:border-white/10"
-                        }`}
+                        onClick={() => handleEquipmentChange(equip.id)}
+                        className="w-full text-left p-4 rounded-xl transition-all duration-400 border relative overflow-hidden"
+                        style={{
+                          background: isActive ? `${eColor.glow}` : "rgba(255,255,255,0.01)",
+                          borderColor: isActive ? eColor.ring + "55" : "rgba(255,255,255,0.05)",
+                          boxShadow: isActive ? `0 0 20px ${eColor.glow}, inset 0 1px 0 rgba(255,255,255,0.04)` : "none",
+                        }}
                       >
                         <div className="flex items-center justify-between">
-                          <span className={`font-heading text-lg font-bold tracking-wide ${
-                            showroomEquipment === equip.id ? "text-red-400" : "text-white"
-                          }`}>
+                          <span
+                            className="font-heading text-lg font-bold tracking-wide"
+                            style={{ color: isActive ? eColor.ring : "white" }}
+                          >
                             {equip.name}
                           </span>
-                          <span className="text-[10px] font-mono text-gray-500">
-                            {equip.id === "barbell" ? "3D_BAR" : equip.id === "dumbbell" ? "3D_DUMB" : "3D_KETTLE"}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="text-[9px] font-mono tracking-widest"
+                              style={{ color: isActive ? eColor.ring : "rgba(255,255,255,0.2)" }}
+                            >
+                              {TRAINING_MODES[equip.id].label}
+                            </span>
+                          </div>
                         </div>
                         <div className="text-xs text-gray-400 mt-2 font-mono line-clamp-1">
                           Targets: {equip.muscles}
                         </div>
+                        {/* Active indicator bar */}
+                        {isActive && (
+                          <div
+                            className="absolute left-0 top-0 bottom-0 w-0.5 rounded-r"
+                            style={{ background: eColor.ring }}
+                          />
+                        )}
                       </button>
-                    ))}
+                    );})}
                   </div>
 
                   {/* Active Equipment Details */}

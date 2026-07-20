@@ -1,21 +1,55 @@
 @import "tailwindcss";
 
 /* ============================================
-   Fitness Plus Gym - Global Styles
+   Fitness Plus Gym — Cinematic Design System
    ============================================ */
 
 :root {
+  /* Base palette */
+  --color-base: #050505;
+  --color-base-light: #0a0a0a;
   --color-primary: #000000;
-  --color-secondary: #ff0000;
-  --color-accent: #ff2d2d;
-  --color-glow: rgba(255, 0, 0, 0.6);
-  --color-glow-soft: rgba(255, 0, 0, 0.15);
-  --color-dark-bg: #050505;
+
+  /* Red — controlled signal, not everywhere */
+  --color-red: #dc2626;
+  --color-red-bright: #ff2d2d;
+  --color-red-glow: rgba(220, 38, 38, 0.6);
+  --color-red-soft: rgba(220, 38, 38, 0.12);
+
+  /* Chrome / Silver accent */
+  --color-chrome: #c7c7c7;
+  --color-chrome-dim: #8a8a8a;
+
+  /* Copper / Amber — used sparingly for warmth */
+  --color-copper: #b87333;
+  --color-amber: #d97706;
+  --color-amber-glow: rgba(184, 115, 51, 0.25);
+
+  /* Text */
+  --color-text: #f5f5f5;
+  --color-text-dim: #9ca3af;
+  --color-text-muted: rgba(255, 255, 255, 0.25);
+
+  /* Card surfaces */
   --color-card-bg: rgba(255, 255, 255, 0.03);
   --color-card-border: rgba(255, 255, 255, 0.06);
+
+  /* Legacy compat */
+  --color-secondary: #dc2626;
+  --color-accent: #ff2d2d;
+  --color-glow: rgba(220, 38, 38, 0.6);
+  --color-glow-soft: rgba(220, 38, 38, 0.15);
+  --color-dark-bg: #050505;
+
+  /* Typography stacks */
   --font-heading-stack: "Arial Narrow", "Bahnschrift Condensed", sans-serif;
   --font-body-stack: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-mono-stack: "Courier New", "Lucida Console", monospace;
 }
+
+/* ============================================
+   Base Reset
+   ============================================ */
 
 html {
   scroll-behavior: smooth;
@@ -23,32 +57,33 @@ html {
 
 body {
   font-family: var(--font-body), var(--font-body-stack);
-  background: var(--color-dark-bg);
-  color: #ffffff;
+  background: var(--color-base);
+  color: var(--color-text);
   overflow-x: hidden;
 }
 
 ::selection {
-  background: rgba(255, 0, 0, 0.3);
+  background: rgba(220, 38, 38, 0.35);
   color: #ffffff;
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: #080808;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 0, 0, 0.4);
+  background: rgba(220, 38, 38, 0.45);
   border-radius: 3px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 0, 0, 0.6);
+  background: rgba(220, 38, 38, 0.7);
 }
+
+/* ============================================
+   Glass Surfaces
+   ============================================ */
 
 .glass {
   background: rgba(255, 255, 255, 0.03);
@@ -67,114 +102,328 @@ body {
 
 .glass-card:hover {
   background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 0, 0, 0.3);
+  border-color: rgba(220, 38, 38, 0.3);
   box-shadow:
-    0 0 40px rgba(255, 0, 0, 0.08),
+    0 0 40px rgba(220, 38, 38, 0.08),
     0 20px 60px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
+.glass-dark {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* ============================================
+   Text Effects
+   ============================================ */
+
 .text-glow {
   text-shadow:
-    0 0 20px rgba(255, 0, 0, 0.5),
-    0 0 40px rgba(255, 0, 0, 0.3),
-    0 0 80px rgba(255, 0, 0, 0.1);
+    0 0 20px rgba(220, 38, 38, 0.6),
+    0 0 40px rgba(220, 38, 38, 0.3),
+    0 0 80px rgba(220, 38, 38, 0.12);
 }
 
 .text-glow-subtle {
   text-shadow:
-    0 0 10px rgba(255, 0, 0, 0.3),
-    0 0 20px rgba(255, 0, 0, 0.15);
+    0 0 10px rgba(220, 38, 38, 0.35),
+    0 0 22px rgba(220, 38, 38, 0.18);
 }
+
+.text-glow-white {
+  text-shadow:
+    0 0 15px rgba(255, 255, 255, 0.4),
+    0 0 30px rgba(255, 255, 255, 0.15);
+}
+
+.text-chrome {
+  color: var(--color-chrome);
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.6),
+    0 0 12px rgba(199, 199, 199, 0.2);
+}
+
+/* Cinematic display text — used in PerformanceStory overlays */
+.cinematic-text {
+  font-family: var(--font-heading), var(--font-heading-stack);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+  line-height: 0.95;
+}
+
+.cinematic-text-red {
+  font-family: var(--font-heading), var(--font-heading-stack);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: var(--color-red-bright);
+  line-height: 0.95;
+  text-shadow:
+    0 0 30px rgba(220, 38, 38, 0.5),
+    0 0 60px rgba(220, 38, 38, 0.2);
+}
+
+/* ============================================
+   Box Glow System
+   ============================================ */
 
 .box-glow {
   box-shadow:
-    0 0 20px rgba(255, 0, 0, 0.3),
-    0 0 40px rgba(255, 0, 0, 0.15),
-    0 0 80px rgba(255, 0, 0, 0.05);
+    0 0 20px rgba(220, 38, 38, 0.3),
+    0 0 40px rgba(220, 38, 38, 0.12),
+    0 0 80px rgba(220, 38, 38, 0.05);
 }
 
 .box-glow-intense {
   box-shadow:
-    0 0 30px rgba(255, 0, 0, 0.5),
-    0 0 60px rgba(255, 0, 0, 0.3),
-    0 0 120px rgba(255, 0, 0, 0.1);
+    0 0 30px rgba(220, 38, 38, 0.55),
+    0 0 60px rgba(220, 38, 38, 0.3),
+    0 0 120px rgba(220, 38, 38, 0.1);
 }
+
+.box-glow-chrome {
+  box-shadow:
+    0 0 15px rgba(199, 199, 199, 0.15),
+    0 0 30px rgba(199, 199, 199, 0.06);
+}
+
+.box-glow-amber {
+  box-shadow:
+    0 0 20px rgba(184, 115, 51, 0.3),
+    0 0 40px rgba(184, 115, 51, 0.12);
+}
+
+/* ============================================
+   Gradient Backgrounds
+   ============================================ */
 
 .gradient-dark {
-  background: linear-gradient(180deg, #050505 0%, #0a0a0a 50%, #050505 100%);
-}
-
-.gradient-radial-red {
-  background: radial-gradient(ellipse at center, rgba(255, 0, 0, 0.08) 0%, transparent 70%);
+  background: linear-gradient(180deg, #050505 0%, #080808 50%, #050505 100%);
 }
 
 .gradient-hero {
   background:
-    radial-gradient(ellipse at 50% 30%, rgba(255, 0, 0, 0.12) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 80%, rgba(255, 45, 45, 0.06) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 30%, rgba(220, 38, 38, 0.1) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(220, 38, 38, 0.05) 0%, transparent 40%),
     linear-gradient(180deg, #020202 0%, #050505 100%);
 }
 
-@keyframes pulse-glow {
-  0%,
-  100% {
-    box-shadow:
-      0 0 20px rgba(255, 0, 0, 0.4),
-      0 0 40px rgba(255, 0, 0, 0.2);
-  }
+.gradient-radial-red {
+  background: radial-gradient(ellipse at center, rgba(220, 38, 38, 0.08) 0%, transparent 70%);
+}
 
+.gradient-copper {
+  background: radial-gradient(ellipse at center, rgba(184, 115, 51, 0.06) 0%, transparent 70%);
+}
+
+/* ============================================
+   Dividers
+   ============================================ */
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.25), transparent);
+}
+
+.section-divider-chrome {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(199, 199, 199, 0.15), transparent);
+}
+
+/* ============================================
+   Noise / Film Grain Overlay
+   ============================================ */
+
+.noise-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Animated grain for cinematic sections */
+.grain-overlay {
+  position: relative;
+}
+
+.grain-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
+  animation: grain-shift 0.5s steps(2) infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes grain-shift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-1%, -1%); }
+  50% { transform: translate(1%, 0); }
+  75% { transform: translate(0, 1%); }
+  100% { transform: translate(-1%, 1%); }
+}
+
+/* ============================================
+   Performance Story — Sticky Scroll Section
+   ============================================ */
+
+.performance-story-section {
+  position: relative;
+  height: 500vh;
+}
+
+.performance-story-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.performance-story-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Cinematic text overlay inside sticky viewport */
+.story-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 3rem 4rem;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.story-overlay-top {
+  position: absolute;
+  top: 3rem;
+  left: 4rem;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.story-cta-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.story-cta-overlay.active {
+  pointer-events: auto;
+}
+
+/* ============================================
+   Equipment Showroom — Premium Upgrade
+   ============================================ */
+
+.showroom-spec-callout {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono-stack);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(199, 199, 199, 0.6);
+  pointer-events: none;
+}
+
+.showroom-spec-callout::before {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: rgba(220, 38, 38, 0.6);
+  flex-shrink: 0;
+}
+
+.training-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono-stack);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  border: 1px solid;
+  transition: all 0.3s ease;
+}
+
+/* ============================================
+   Keyframe Animations
+   ============================================ */
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(220, 38, 38, 0.4),
+      0 0 40px rgba(220, 38, 38, 0.2);
+  }
   50% {
     box-shadow:
-      0 0 30px rgba(255, 0, 0, 0.6),
-      0 0 60px rgba(255, 0, 0, 0.3),
-      0 0 100px rgba(255, 0, 0, 0.1);
+      0 0 30px rgba(220, 38, 38, 0.65),
+      0 0 60px rgba(220, 38, 38, 0.32),
+      0 0 100px rgba(220, 38, 38, 0.1);
   }
 }
 
 @keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
 
 @keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-
-  100% {
-    background-position: 200% 0;
-  }
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 @keyframes heartbeat {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  14% {
-    transform: scale(1.15);
-  }
-
-  28% {
-    transform: scale(1);
-  }
-
-  42% {
-    transform: scale(1.1);
-  }
-
-  56% {
-    transform: scale(1);
-  }
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.15); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.1); }
+  56% { transform: scale(1); }
 }
+
+@keyframes scan-line {
+  0% { top: -2px; }
+  100% { top: 100%; }
+}
+
+@keyframes rim-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes copper-shimmer {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+  100% { opacity: 0.3; }
+}
+
+/* ============================================
+   Animation Utility Classes
+   ============================================ */
 
 .animate-pulse-glow {
   animation: pulse-glow 2.5s ease-in-out infinite;
@@ -193,20 +442,48 @@ body {
   animation: heartbeat 2s ease-in-out infinite;
 }
 
-.section-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.3), transparent);
+.animate-scan-line {
+  animation: scan-line 2s linear infinite;
 }
 
-.noise-overlay::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
+.animate-rim-pulse {
+  animation: rim-pulse 2s ease-in-out infinite;
 }
+
+.animate-copper-shimmer {
+  animation: copper-shimmer 3s ease-in-out infinite;
+}
+
+/* ============================================
+   Typography
+   ============================================ */
 
 .font-heading {
   font-family: var(--font-heading), var(--font-heading-stack);
+}
+
+.font-mono-custom {
+  font-family: var(--font-mono-stack);
+}
+
+/* ============================================
+   Reduced Motion Fallback
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .grain-overlay::after {
+    animation: none;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
 }

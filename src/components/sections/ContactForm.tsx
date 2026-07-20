@@ -24,7 +24,10 @@ export default function ContactForm({ prefilledMessage = "" }: ContactFormProps)
 
   useEffect(() => {
     if (prefilledMessage) {
-      setFormData((prev) => ({ ...prev, message: prefilledMessage }));
+      const timer = setTimeout(() => {
+        setFormData((prev) => ({ ...prev, message: prefilledMessage }));
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [prefilledMessage]);
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Oswald, Inter } from "next/font/google";
+import ChatBot from "@/components/ui/ChatBot";
 import "./globals.css";
 
 // ============================================
@@ -61,6 +62,7 @@ export default function RootLayout({
     <html lang="en" className={`scroll-smooth ${oswald.variable} ${inter.variable}`}>
       <body className="bg-[#050505] text-white antialiased overflow-x-hidden">
         {children}
+        <ChatBot />
       </body>
     </html>
   );
