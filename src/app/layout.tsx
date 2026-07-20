@@ -59,8 +59,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`scroll-smooth ${oswald.variable} ${inter.variable}`}>
-      <body className="bg-[#050505] text-white antialiased overflow-x-hidden">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`scroll-smooth ${oswald.variable} ${inter.variable}`}
+    >
+      <body suppressHydrationWarning className="bg-[#050505] text-white antialiased overflow-x-hidden">
         {children}
         <ChatBot />
       </body>

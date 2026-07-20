@@ -202,6 +202,8 @@ function AmbientSparks({ scrollRef }: { scrollRef: React.RefObject<number> }) {
 
 export default function HeroScene() {
   const scrollRef = useRef<number>(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -214,17 +216,21 @@ export default function HeroScene() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <Canvas
-      camera={{ position: [0, 0, 6], fov: 42 }}
-      dpr={[1, 1.5]}
-      gl={{
-        antialias: true,
-        alpha: true,
-        powerPreference: "high-performance",
-        toneMapping: THREE.ACESFilmicToneMapping,
-        toneMappingExposure: 1.35,
-      }}
+    <div
+      ref={containerRef}
       style={{
         position: "absolute",
         top: 0,
@@ -234,53 +240,73 @@ export default function HeroScene() {
         zIndex: 0,
       }}
     >
-      <Suspense fallback={null}>
-        {/* Deep cinematic fog — tightens in Act 1-2 */}
-        <fog attach="fog" args={["#050505", 6, 18]} />
+      <Canvas
+        frameloop={isVisible ? "always" : "never"}
+        camera={{ position: [0, 0, 6], fov: 42 }}
+        dpr={[1, 1.5]}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: "high-performance",
+          toneMapping: THREE.ACESFilmicToneMapping,
+          toneMappingExposure: 1.35,
+        }}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <Suspense fallback={null}>
+          {/* Deep cinematic fog — tightens in Act 1-2 */}
+          <fog attach="fog" args={["#050505", 6, 18]} />
 
-        {/* Environment for chrome reflections */}
-        <Environment preset="night" />
+          {/* Environment for chrome reflections */}
+          <Environment preset="night" />
 
-        {/* Cinematic lighting */}
-        <Lighting scrollProgress={scrollRef} mode="hero" />
+          {/* Cinematic lighting */}
+          <Lighting scrollProgress={scrollRef} mode="hero" />
 
-        {/* === HERO OBJECT: Olympic Barbell === */}
-        <Barbell
-          scale={1.05}
-          position={[0, 0.1, 0]}
-          scrollRef={scrollRef}
-          assemblyProgress={1} // plates always assembled in hero (assembly in PerformanceStory)
-          isHero={true}
-        />
+          {/* === HERO OBJECT: Olympic Barbell === */}
+          <Barbell
+            scale={1.05}
+            position={[0, 0.1, 0]}
+            scrollRef={scrollRef}
+            assemblyProgress={1} // plates always assembled in hero (assembly in PerformanceStory)
+            isHero={true}
+          />
 
-        {/* Cinematic particle system */}
-        <Particles
-          count={320}
-          scrollRef={scrollRef}
-          color="#ff3333"
-          spread={6}
-        />
+          {/* Cinematic particle system */}
+          <Particles
+            count={320}
+            scrollRef={scrollRef}
+            color="#ff3333"
+            spread={6}
+          />
 
-        {/* Secondary silver particles for depth */}
-        <Particles
-          count={80}
-          scrollRef={scrollRef}
-          color="#c7c7c7"
-          spread={9}
-          intensity={0.3}
-        />
+          {/* Secondary silver particles for depth */}
+          <Particles
+            count={80}
+            scrollRef={scrollRef}
+            color="#c7c7c7"
+            spread={9}
+            intensity={0.3}
+          />
 
-        {/* Orbiting sparks from Act 2 onward */}
-        <AmbientSparks scrollRef={scrollRef} />
+          {/* Orbiting sparks from Act 2 onward */}
+          <AmbientSparks scrollRef={scrollRef} />
 
-        {/* Ground grid appears from Act 2 */}
-        <GroundGrid scrollRef={scrollRef} />
+          {/* Ground grid appears from Act 2 */}
+          <GroundGrid scrollRef={scrollRef} />
 
-        {/* 4-act scroll camera rig */}
-        <CameraRig scrollRef={scrollRef} />
+          {/* 4-act scroll camera rig */}
+          <CameraRig scrollRef={scrollRef} />
 
-        <Preload all />
-      </Suspense>
-    </Canvas>
+          <Preload all />
+        </Suspense>
+      </Canvas>
+    </div>
   );
 }
